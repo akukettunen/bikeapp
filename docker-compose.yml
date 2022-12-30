@@ -12,6 +12,8 @@ services:
       - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
     volumes:
       - db:/var/lib/mysql
+      # this runs the init script of the database
+      - "./scripts/schema.sql:/docker-entrypoint-initdb.d/config/init.sql"
   app:
     depends_on:
       - mysqldb
