@@ -4,6 +4,6 @@ WORKDIR /bikeapp
 COPY package.json .
 RUN npm install
 COPY . .
-RUN node import.js
+RUN node config/import.js
 CMD npm start
 
