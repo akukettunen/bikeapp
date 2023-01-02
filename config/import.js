@@ -1,9 +1,23 @@
 const fs = require('fs')
 const readline = require('readline')
+const mysql = require('mysql')
+require('dotenv').config()
 
-console.log('importing data...')
+console.log('Starting data import...')
 
-const parseTrips = fileName => {
+// Configure the mysql connection
+const conf = {
+  host: 'mysqldb',
+  user: process.env.MYSQLDB_USER,
+  password: process.env.MYSQLDB_ROOT_PASSWORD,
+  database: process.env.MYSQLDB_DATABASE,
+  port: process.env.MYSQLDB_LOCAL_PORT,
+}
+
+let connection = mysql.createConnection(conf);
+connection.connect();
+
+const parseFiles = async (fileName, isStations) => {
   /*
     Input: path of the file parsed
     Output: [ true | false ] whether the line was valid and added to db
@@ -11,25 +25,32 @@ const parseTrips = fileName => {
     This function parses and validates the csv-file and adds
     its valid rows to database
   */
-  let trips_total = 0
-  let trips_denied = 0
+  console.log(`Validating data on file ${fileName}`)
 
   const readStream = fs.createReadStream(fileName)
-  let rl = readline.createInterface({ input: readStream })
+  let rl = readline.createInterface({ input: readStream, crlfDelay: Infinity })
+  let lines = 0
+  let validLines = []
 
-  rl.on('line', line => {
+  for await (const line of rl) {
     const vals = line.split(',')
-
-    trips_total++
-
-    const isValid = validateTrip(vals)
+    const isValid = isStations ? validateStation(vals) : validateTrip(vals);
 
     if(isValid) {
-      addToDb(vals)
-    } else {
-      trips_denied++
+      validLines.push(vals)
     }
-  })
+
+    lines++
+  }
+  
+  console.log(`File contained ${lines} lines`)
+  console.log(`Valid were ${validLines.length}`)
+  console.log(`Adding lines to db`)
+
+  if(isStations) addToDbStation(validLines)
+  else addToDb(validLines)
+
+  return
 }
 
 const validateTrip = (vals) => {
@@ -69,6 +90,74 @@ const validateTrip = (vals) => {
   return valid
 }
 
+const validateStation = (vals) => {
+  /*
+    Input: A station csv line split into an array
+    Output: [true | false] - is the array a valid station
+  */
+
+  if(!vals || vals.length !== 13) return false
+
+  const [
+    fid,
+    id,
+    name_fi,
+    name_sv,
+    name_en,
+    addr,
+    addr_en,
+    city_fi,
+    city_sv,
+    operator,
+    capacity
+  ] = vals
+
+  let valid = true
+
+  valid = isInt(fid)
+  valid = isInt(id)
+  valid = isString(name_fi)
+  valid = isString(name_sv)
+  valid = isString(name_en)
+  valid = isString(addr)
+  valid = isString(addr_en)
+  valid = isString(city_fi, true)
+  valid = isString(city_sv, true)
+  valid = isString(operator, true)
+  valid = isInt(capacity)
+
+  return valid
+}
+
+const addToDb = (values) => {
+  connection.query(`
+    INSERT INTO trips( departure_time, return_time, departure_station_id, departure_station_name, return_station_id, return_station_name, distance, duration )
+    VALUES (?);
+  `,
+  values
+  , (error, results, fields) => {
+    if (error) throw error;
+    console.log('Added to db!');
+  });
+}
+
+const addToDbStation = (values) => {
+
+  connection.query(`
+    INSERT INTO stations( fid, id, name_fi, name_sv, name_en, addr_fi, addr_en, city_fi, city_sv, operator, capacity, x, y )
+    VALUES (?);
+  `,
+  values
+  , (error, results) => {
+    if (error) throw error;
+    console.log('Added to db!');
+  });
+}
+
+
+/*
+Functions for validating data 
+*/
 const isIsoDate = (str) => {
   // Validates isoDateStrings | 2021-05-31T23:57:25
 
@@ -93,11 +182,17 @@ const isInt = (str) => {
   return true
 }
 
+addFiles = async () => {
+  await parseFiles('data/stations.csv', true)
+  await parseFiles('data/trips_05.csv', false)
+  await parseFiles('data/trips_06.csv', false)
+  await parseFiles('data/trips_07.csv', false)
 
-const addToDb = (line) => {
-
+  connection.end();
 }
 
-parseTrips('data/trips_05.csv')
+addFiles()
+
+// Let's not leave the db hanging
 
 // TODO: unit tests for functions
