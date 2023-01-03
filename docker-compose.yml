@@ -11,24 +11,28 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD="true"
       - MYSQL_DATABASE=$MYSQLDB_DATABASE
     ports:
-      - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+      # - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+      - 3306:3306
     expose:
       - $MYSQLDB_LOCAL_PORT
       - $MYSQLDB_DOCKER_PORT
     volumes:
       - db:/var/lib/mysql
       # this runs the init script of the database
+      - ./config/init_db.sql:/docker-entrypoint-initdb.d/0_init.sql
       # - "./scripts/schema.sql:/docker-entrypoint-initdb.d/init_db.sql"
       # - ./init:/docker-entrypoint-initdb.d
-  db_seeder:
-    image: mysql:latest
-    volumes:
-      - ./init_db.sql:/init_db.sql
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
-    entrypoint: [ "bash", "-c", "sleep 3 && mysql --user=root --host=mysqldb --password=$MYSQLDB_ROOT_PASSWORD --port=3306 bikeapp < /init_db.sql && exit"] 
-    depends_on:
-      - mysqldb
+    networks:
+      - internalnet
+  # db_seeder:
+  #   image: mysql:latest
+  #   volumes:
+  #     - ./init_db.sql:/init_db.sql
+  #   environment:
+  #     MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+  #   entrypoint: [ "bash", "-c", "sleep 3 && mysql --user=root --host=mysqldb --password=$MYSQLDB_ROOT_PASSWORD --port=3306 bikeapp < /init_db.sql && exit"] 
+  #   depends_on:
+  #     - mysqldb
   app:
     depends_on:
       - mysqldb
@@ -40,13 +44,19 @@ services:
     links:
       - mysqldb:mysqldb
     environment:
-      - DB_HOST=mysqldb
+      - DB_HOST=localhost
       - DB_USER=$MYSQLDB_USER
       - DB_PASSWORD=$MYSQLDB_ROOT_PASSWORD
       - DB_NAME=$MYSQLDB_DATABASE
       - DB_PORT=$MYSQLDB_DOCKER_PORT
     stdin_open: true
     # tty: true
+    networks:
+      - internalnet
 
 volumes: 
   db:
+
+networks:
+  internalnet:
+    driver: bridge

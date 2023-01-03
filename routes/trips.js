@@ -4,14 +4,18 @@ const express = require('express');
 
 router.get('/', (req, res) => {
   const { offset, limit } = req.query
-  res.json({ok: 'ok'})
+
+  if(!offset || !limit) {
+    res.status(400).send('missing query params')
+  }
+
   db.query(`
     SELECT * FROM trips
     LIMIT ?, ?
     ORDER BY departure_time DESC;
-  `, [offset, limit], (err, results) => {
+  `, [parseInt(offset), parseInt(limit)], (err, results) => {
     if(err) {
-      res.status(500).send('something went wrong :/')
+      res.status(500).send(err)
       return
     } else {
       res.json(results)

@@ -3,18 +3,14 @@ const db_config = require('../config/db.config.js')
 
 // Create connection
 let conf = {
+  host: process.env.MYSQL_DB_HOST,
+  port: process.env.MYSQLDB_DOCKER_PORT,
   user: process.env.MYSQLDB_USER,
   password: process.env.MYSQLDB_ROOT_PASSWORD,
   database: process.env.MYSQLDB_DATABASE,
-  port: '3307'
+  connectionLimit: 20
 }
 
-console.log(conf)
+const db = mysql.createPool(conf)
 
-const connect = () => {
-  const db = mysql.createConnection(db_config)
-
-  return db
-}
-
-module.exports = { connect }
+module.exports = { db }

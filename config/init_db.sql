@@ -1,5 +1,5 @@
--- drop table stations;
--- drop table trips;
+drop table if exists stations;
+drop table if exists trips;
 
 CREATE TABLE IF NOT EXISTS stations (
   fid int not null,
@@ -28,3 +28,7 @@ CREATE TABLE IF NOT EXISTS trips (
   distance int not null,
   duration int not null
 );
+
+ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY '123456'; 
+
+flush privileges;
