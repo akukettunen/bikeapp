@@ -11,13 +11,12 @@ const conf = {
   user: process.env.MYSQLDB_USER,
   password: process.env.MYSQLDB_ROOT_PASSWORD,
   database: process.env.MYSQLDB_DATABASE,
-  port: process.env.MYSQLDB_DOCKER_PORT,
+  port: process.env.MYSQLDB_DOCKER_PORT
 }
 
 console.log(conf)
 
-let connection = mysql.createConnection(conf);
-connection.connect();
+let connection = mysql.createPool(conf);
 
 const parseFiles = async (fileName, isStations) => {
   /*
@@ -76,18 +75,18 @@ const validateTrip = (vals) => {
 
   let valid = true
 
-  valid = isIsoDate(dep_t)
-  valid = isIsoDate(ret_t)
-  valid = isInt(dep_station_id)
-  valid = isString(dep_station_name)
-  valid = isInt(ret_station_id)
-  valid = isString(ret_station_name)
-  valid = isInt(distance)
-  valid = isInt(duration)
+  valid = valid && isIsoDate(dep_t)
+  valid = valid && isIsoDate(ret_t)
+  valid = valid && isInt(dep_station_id)
+  valid = valid && isString(dep_station_name)
+  valid = valid && isInt(ret_station_id)
+  valid = valid && isString(ret_station_name)
+  valid = valid && isInt(distance)
+  valid = valid && isInt(duration)
 
   // Dont import short trips ( under 10m or 10s )
-  valid = parseInt(distance) > 10
-  valid = parseInt(duration) > 10
+  valid = valid && parseInt(distance) > 10
+  valid = valid && parseInt(duration) > 10
 
   return valid
 }
@@ -116,27 +115,28 @@ const validateStation = (vals) => {
 
   let valid = true
 
-  valid = isInt(fid)
-  valid = isInt(id)
-  valid = isString(name_fi)
-  valid = isString(name_sv)
-  valid = isString(name_en)
-  valid = isString(addr)
-  valid = isString(addr_en)
-  valid = isString(city_fi, true)
-  valid = isString(city_sv, true)
-  valid = isString(operator, true)
-  valid = isInt(capacity)
+  valid = valid && isInt(fid)
+  valid = valid && isInt(id)
+  valid = valid && isString(name_fi)
+  valid = valid && isString(name_sv)
+  valid = valid && isString(name_en)
+  valid = valid && isString(addr)
+  valid = valid && isString(addr_en)
+  valid = valid && isString(city_fi, true)
+  valid = valid && isString(city_sv, true)
+  valid = valid && isString(operator, true)
+  valid = valid && isInt(capacity)
 
   return valid
 }
 
 const addToDb = (values) => {
+  console.log(values.length)
   connection.query(`
     INSERT INTO trips( departure_time, return_time, departure_station_id, departure_station_name, return_station_id, return_station_name, distance, duration )
-    VALUES (?);
+    VALUES ?;
   `,
-  values
+  [values.slice(0, 1000)]
   , (error, results, fields) => {
     if (error) throw error;
     console.log('Added to db!');
@@ -144,12 +144,11 @@ const addToDb = (values) => {
 }
 
 const addToDbStation = (values) => {
-
   connection.query(`
     INSERT INTO stations( fid, id, name_fi, name_sv, name_en, addr_fi, addr_en, city_fi, city_sv, operator, capacity, x, y )
-    VALUES (?);
+    VALUES ?;
   `,
-  values
+  [values]
   , (error, results) => {
     if (error) throw error;
     console.log('Added to db!');
@@ -190,11 +189,9 @@ addFiles = async () => {
   await parseFiles('data/trips_06.csv', false)
   await parseFiles('data/trips_07.csv', false)
 
-  connection.end();
+  connection.end()
 }
 
 addFiles()
-
-// Let's not leave the db hanging
 
 // TODO: unit tests for functions

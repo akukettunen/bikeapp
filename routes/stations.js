@@ -11,8 +11,7 @@ router.get('/', (req, res) => {
 
   db.query(`
     SELECT *
-    FROM trips
-    ORDER BY departure_time DESC
+    FROM stations
     LIMIT ?, ?;
   `, [parseInt(offset), parseInt(limit)], (err, results) => {
     if(err) {
