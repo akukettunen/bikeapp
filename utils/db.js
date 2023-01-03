@@ -11,14 +11,10 @@ let conf = {
 
 console.log(conf)
 
-const db = mysql.createConnection(db_config)
+const connect = () => {
+  const db = mysql.createConnection(db_config)
 
-// Connect 
-db.connect((err) => {
-  if(err){
-    throw err;
-  }
-  console.log('MySQL Connected...');
-});
+  return db
+}
 
-module.exports = { db }
+module.exports = { connect }
