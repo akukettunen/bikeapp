@@ -7,6 +7,7 @@ router.get('/', (req, res) => {
 
   if(!offset || !limit) {
     res.status(400).send('missing query params')
+    return
   }
 
   db.query(`
