@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.7'
 
 services:
   mysqldb:
@@ -24,34 +24,11 @@ services:
   app:
     depends_on:
       - mysqldb
-    # command: npm test
     build: ./
     restart: unless-stopped
     env_file: ./.env
     ports:
       - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
-    links:
-      - mysqldb:mysqldb
-    environment:
-      - DB_HOST=localhost
-      - DB_USER=$MYSQLDB_USER
-      - DB_PASSWORD=$MYSQLDB_ROOT_PASSWORD
-      - DB_NAME=$MYSQLDB_DATABASE
-      - DB_PORT=$MYSQLDB_DOCKER_PORT
-    stdin_open: true
-    tty: true
-    networks:
-      - internalnet
-  tests:
-    depends_on:
-      - mysqldb
-      - app
-    command: npm test
-    build: ./
-    restart: "no"
-    env_file: ./.env
-    # ports:
-    #   - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
     links:
       - mysqldb:mysqldb
     environment:
