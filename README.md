@@ -1,5 +1,19 @@
-### Overview
-This a project created to apply into the Dev Academy of spring 2023 by Solita. It consists of a [Node + Express.js backend](https://github.com/akukettunen/bikeapp) and a [Vue.js frontend](https://github.com/akukettunen/bikeapp-front).
+## Table of Contents
+* [Overview](#overview)
+  * [Features](#features)
+  * [Backend](#backend)
+  * [Frontend](#frontend)
+* [Deployed already](#deployed-already)
+* [Running the app locally](#running-the-app)
+* [Things learned while building](#things-learned-while-building)
+* [Todo](#quality-of-life-improvements-i-would-implement-first)
+
+
+## Overview
+App is running [here](http://bikeapp.s3-website-us-east-1.amazonaws.com/#/stations)!
+Frontend repo is [here](https://github.com/akukettunen/bikeapp-front)!
+
+This project is my solution to Solitas Dev Academy pre-assignment! It consists of a [Node + Express.js backend](https://github.com/akukettunen/bikeapp) and a [Vue.js frontend](https://github.com/akukettunen/bikeapp-front).
 
 ##### Features
 The features implemented are:
@@ -23,19 +37,21 @@ The features implemented are:
 There's also tests for the backend endpoints and some other unit tests implemented with Jest. The backend is Dockerized and is running on an EC2 instance. 
 
 ##### Backend
-Find backend documentation [here](http://ec2-52-71-12-254.compute-1.amazonaws.com:6060/docs/) : ) (Made with swagger)
+Find API documentation [here](http://ec2-52-71-12-254.compute-1.amazonaws.com:6060/docs/) :)
+
+The backend consists of a Node+Express server and a MySQL database. Both of these are Dockerized and handled with a docker-compose file. These are running in an EC2 instance on AWS
+
+Data was imported into the database via a script that also validated the data.
 
 ##### Frontend
 The frontend is a Vue app touched up using [Vuetify](https://vuetifyjs.com/en/). It has been deployed into an S3 bucket which is a neat place to serve frontends from. The frontend uses [Vuex](https://vuex.vuejs.org/) for state management and Vue router to take care of routing.
 
-### Deployed already :)
+## Deployed already
 This repository has already been deployed and is running [here](http://bikeapp.s3-website-us-east-1.amazonaws.com/#/stations)!
-
-The backend is running in a Docker container on an EC2 instance and the Vue frontend is served from an S3 bucket.
 
 If you wish, feel free to follow the instructions below to run the app and tests locally.
 
-### Running the app
+## Running the app locally
 
 ##### 1. Requirements
 You will need the following installed
@@ -128,3 +144,5 @@ The app is now fully up! To view it go to **localhost:8080** on your browser of 
 * Some color wouldn't hurt the UI
 
 * Better responsiveness for mobile view
+
+* SSL for the backend so that the frontend could also be served over https
