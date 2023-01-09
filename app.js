@@ -14,6 +14,4 @@ app.use(cors())
 app.use('/trips', trips);
 app.use('/stations', stations);
 
-var port = process.env.NODE_DOCKER_PORT || 4040;
-
 module.exports = app;

@@ -20,6 +20,7 @@ router.get('/', (req, res) => {
       return
     } else {
       res.json(results)
+      return
     }
   })
 })
@@ -45,7 +46,12 @@ router.get('/:id', (req, res) => {
       return
     } else {
       [ results ] = results
+
+      if( !results ) {
+        res.status(204).send('data not found')
+      }
       res.json(results)
+      return
     }
   })
 })
