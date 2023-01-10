@@ -136,7 +136,8 @@ The app is now fully up! To view it go to **localhost:8080** on your browser of 
 
 * Loading indicators for data - skeletons maybe
 
-* Paging doesn't allow for choosing a page
+* Paging should allow for choosing a page
+  * Would need to fetch the total amount of lines in db?
 
 * At the moment you can go over on the pagination
    - meaning you can scroll to an empty page
@@ -146,3 +147,7 @@ The app is now fully up! To view it go to **localhost:8080** on your browser of 
 * Better responsiveness for mobile view
 
 * SSL for the backend so that the frontend could also be served over https
+
+###### Check out more
+
+More of my work at [devaku.com](https://devaku.com)
