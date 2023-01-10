@@ -103,6 +103,9 @@ The backend should now run at port 8080.
 ##### 4. Import data
 After the containers are running, to validate and import data into the database run
 ```
+npm install
+```
+```
 node config/import/import.js
 ```
 
