@@ -56,14 +56,13 @@ If you wish, feel free to follow the instructions below to run the app and tests
 ##### 1. Requirements
 You will need the following installed
 
-node
-https://nodejs.org/en/
+[git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
-docker
-https://docs.docker.com/get-docker/
+[node](https://nodejs.org/en/)
 
-docker-compose
-https://docker-docs.netlify.app/compose/install/
+[docker](https://docs.docker.com/get-docker/)
+
+[docker-compose](https://docker-docs.netlify.app/compose/install/)
 
 ##### 2. Data setup
 Add the data with which the database will be primed into the directory \data and name the files as follows
